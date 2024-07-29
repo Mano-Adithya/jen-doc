@@ -2,23 +2,46 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                script {
-                    // Check out the code from Git
-                    checkout scm
-
-                    // Build Docker image
-                    sh 'docker build -t simple-html:latest .'
+                git 'https://github.com/Mano-Adithya/jen-doc.git'
+            }
+        }
+        
+        stage('Build HTML1') {
+            steps {
+                dir('simple-html') {
+                    script {
+                        docker.build('simple-html:latest')
+                    }
                 }
             }
         }
 
-        stage('Deploy') {
+        stage('Build HTML2') {
+            steps {
+                dir('new-html') {
+                    script {
+                        docker.build('another-html:latest')
+                    }
+                }
+            }
+        }
+
+        stage('Deploy HTML1') {
             steps {
                 script {
-                    // Run Docker container
-                    sh 'docker run -d -p 80:80 simple-html:latest'
+                    // Deploy simple-html container
+                    docker.image('simple-html:latest').run('-d -p 8080:80')
+                }
+            }
+        }
+
+        stage('Deploy HTML2') {
+            steps {
+                script {
+                    // Deploy another-html container
+                    docker.image('another-html:latest').run('-d -p 8081:8081')
                 }
             }
         }
