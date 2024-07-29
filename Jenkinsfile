@@ -9,7 +9,7 @@ pipeline {
                     checkout scm
 
                     // Build Docker image
-                    sh 'sudo docker build -t simple-html:latest .'
+                    sh 'docker build -t simple-html:latest .'
                 }
             }
         }
@@ -18,7 +18,7 @@ pipeline {
             steps {
                 script {
                     // Run Docker container
-                    sh 'sudo docker run -d -p 80:80 simple-html:latest'
+                    sh 'docker run -d -p 80:80 simple-html:latest'
                 }
             }
         }
