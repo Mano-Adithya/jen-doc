@@ -1,46 +1,50 @@
 pipeline {
     agent any
-
     stages {
         stage('Checkout') {
             steps {
-                // Use the correct branch name
-                git branch: 'main', url: 'https://github.com/Mano-Adithya/jen-doc.git'
+                checkout scm
             }
         }
-        
         stage('Build HTML1') {
             steps {
                 dir('simple-html') {
                     script {
-                        docker.build('simple-html:latest')
+                        // Print Docker version for debugging
+                        sh 'docker --version'
+                        // Build Docker image for simple-html
+                        sh 'docker build -t simple-html:latest .'
                     }
                 }
             }
         }
-
         stage('Build HTML2') {
             steps {
                 dir('new-html') {
                     script {
-                        docker.build('another-html:latest')
+                        // Print Docker version for debugging
+                        sh 'docker --version'
+                        // Build Docker image for new-html
+                        sh 'docker build -t new-html:latest .'
                     }
                 }
             }
         }
-
         stage('Deploy HTML1') {
             steps {
                 script {
-                    docker.image('simple-html:latest').run('-d -p 8080:80')
+                    // Deploy HTML1
+                    echo 'Deploying HTML1'
+                    // Add deployment commands here
                 }
             }
         }
-
         stage('Deploy HTML2') {
             steps {
                 script {
-                    docker.image('another-html:latest').run('-d -p 8081:8081')
+                    // Deploy HTML2
+                    echo 'Deploying HTML2'
+                    // Add deployment commands here
                 }
             }
         }
