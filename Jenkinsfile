@@ -5,8 +5,11 @@ pipeline {
         stage('Build') {
             steps {
                 script {
+                    // Check out the code from Git
+                    checkout scm
+
                     // Build Docker image
-                    docker.build('simple-html:latest')
+                    sh 'sudo docker build -t simple-html:latest .'
                 }
             }
         }
@@ -15,7 +18,7 @@ pipeline {
             steps {
                 script {
                     // Run Docker container
-                    docker.image('simple-html:latest').run('-p 80:80')
+                    sh 'sudo docker run -d -p 80:80 simple-html:latest'
                 }
             }
         }
