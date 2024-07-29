@@ -4,7 +4,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Mano-Adithya/jen-doc.git'
+                // Use the correct branch name
+                git branch: 'main', url: 'https://github.com/Mano-Adithya/jen-doc.git'
             }
         }
         
@@ -31,7 +32,6 @@ pipeline {
         stage('Deploy HTML1') {
             steps {
                 script {
-                    // Deploy simple-html container
                     docker.image('simple-html:latest').run('-d -p 8080:80')
                 }
             }
@@ -40,7 +40,6 @@ pipeline {
         stage('Deploy HTML2') {
             steps {
                 script {
-                    // Deploy another-html container
                     docker.image('another-html:latest').run('-d -p 8081:8081')
                 }
             }
