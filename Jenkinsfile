@@ -32,8 +32,8 @@ pipeline {
                         sh """
                         ssh -o StrictHostKeyChecking=no ubuntu@3.110.196.20 "
                             docker pull simple-html:latest &&
-                            docker stop simple_html || true &&
-                            docker rm simple_html || true &&
+                            docker ps -q --filter 'name=simple_html' | grep -q . && docker stop simple_html || true &&
+                            docker ps -a -q --filter 'name=simple_html' | grep -q . && docker rm simple_html || true &&
                             docker run -d --name simple_html -p 8081:80 simple-html:latest
                         "
                         """
@@ -48,8 +48,8 @@ pipeline {
                         sh """
                         ssh -o StrictHostKeyChecking=no ubuntu@3.110.196.20 "
                             docker pull new-html:latest &&
-                            docker stop new_html || true &&
-                            docker rm new_html || true &&
+                            docker ps -q --filter 'name=new_html' | grep -q . && docker stop new_html || true &&
+                            docker ps -a -q --filter 'name=new_html' | grep -q . && docker rm new_html || true &&
                             docker run -d --name new_html -p 8082:80 new-html:latest
                         "
                         """
