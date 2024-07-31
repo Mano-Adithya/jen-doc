@@ -25,29 +25,26 @@ pipeline {
                 }
             }
         }
-        stage('Deploy HTML1') {
-            steps {
-                script {
-                    sshagent(['jen-doc-ssh-key']) {  // Replace 'jen-doc-ssh-key' with your Jenkins SSH key credential ID
-                        sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@3.110.196.20 "
-                            docker pull manoadithyap/simple-html:latest ||
-                            docker run -d --name simple_html -p 8081:80 manoadithyap/simple-html:latest
-                        "
-                        """
-                    }
-                }
-            }
-        }
-        stage('Deploy HTML2') {
+        stage('Deploy') {
             steps {
                 script {
                     sshagent(['jen-doc-ssh-key']) {
                         sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@3.110.196.20 "
-                            docker pull manoadithyap/new-html:latest ||
-                            docker run -d --name new_html -p 8082:80 manoadithyap/new-html:latest
-                        "
+                        ssh -o StrictHostKeyChecking=no ubuntu@3.110.196.20 '
+                            # Pull and run the containers
+                            docker pull simple-html:latest ||
+                            docker run -d --name simple_html -p 8081:8081 simple-html:latest
+
+                            docker pull new-html:latest ||
+                            docker run -d --name new_html -p 8082:8082 new-html:latest
+
+                            # Run Nginx as a reverse proxy
+                            docker run -d --name nginx-proxy -p 8081:80 \
+                            -v /path/to/nginx.conf:/etc/nginx/nginx.conf:ro \
+                            --link simple_html \
+                            --link new_html \
+                            nginx
+                        '
                         """
                     }
                 }
