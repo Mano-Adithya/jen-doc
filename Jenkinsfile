@@ -30,7 +30,7 @@ pipeline {
                 script {
                     sshagent(['jen-doc-ssh-key']) {  // Replace 'jen-doc-ssh-key' with your Jenkins SSH key credential ID
                         sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@3.110.196.20"
+                        ssh -o StrictHostKeyChecking=no ubuntu@3.110.196.20 "
                             docker pull simple-html:latest &&
                             docker stop simple_html || true &&
                             docker rm simple_html || true &&
