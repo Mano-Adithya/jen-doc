@@ -50,7 +50,7 @@ pipeline {
                             docker pull new-html:latest &&
                             docker stop new_html || true &&
                             docker rm new_html || true &&
-                            docker run -d --name new_html -p 8082:80 new-html:latest
+                            docker run -d --name new_html -p 8081:80 new-html:latest
                         "
                         """
                     }
