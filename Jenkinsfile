@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS_ID = 'jen-doc' // Jenkins credential ID for Docker Hub
+        DOCKERHUB_USERNAME = 'DOCKERHUB_USERNAME' // Jenkins credential ID for Docker Hub
+        DOCKERHUB_PASSWORD = 'DOCKERHUB_PASSWORD'
         SSH_CREDENTIALS_ID = 'jen-doc-ssh-key' // Jenkins credential ID for SSH
         DOCKERHUB_REPO = 'manoadithyap/jen-doc-repo' // Replace with your Docker Hub username
         DEPLOY_SERVER = 'ubuntu@3.110.196.20' // Replace with your server IP
