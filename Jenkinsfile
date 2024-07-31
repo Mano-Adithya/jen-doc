@@ -28,7 +28,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    sshagent(['jen-doc-ssh-key']) {  // Replace 'jen-doc-ssh-key' with your Jenkins SSH key credential ID
+                    sshagent(['jen-doc-ssh-key']) {
                         sh '''
                         ssh -o StrictHostKeyChecking=no ubuntu@3.110.196.20 "
                             # Remove existing containers if they exist
