@@ -1,11 +1,12 @@
-# Use an official Nginx image
+# Use the official Nginx image from Docker Hub
 FROM nginx:alpine
 
-# Copy the HTML file to the Nginx directory
+# Copy the HTML file into the Nginx HTML directory
 COPY index2.html /usr/share/nginx/html/index.html
+COPY script.js /usr/share/nginx/html/script.js
 
-# Expose a different port, e.g., 8081
-EXPOSE 8082
+# Expose port 80 (Nginx default)
+EXPOSE 80
 
-# Command to run Nginx and serve the file on the exposed port
+# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
