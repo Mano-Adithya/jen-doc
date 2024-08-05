@@ -22,7 +22,7 @@ function createSection(title, description, linkText, linkUrl) {
 
 // Determine which page to display based on the URL or other logic
 if (window.location.pathname.includes('index.html')) {
-    createSection('Welcome to HTML1 by Mano', 'This is the first microservice.', 'Go to HTML2 Microservice', 'http://3.110.196.20:8082');
+    createSection('Welcome to HTML1 by Mano', 'This is the first microservice.', 'Go to HTML2 Microservice', 'http://13.126.28.55:8082');
 } else if (window.location.pathname.includes('index2.html')) {
-    createSection('Hello from Another HTML Page!', 'This is the second microservice.', 'Go to HTML1 Microservice', 'http://3.110.196.20:8081');
+    createSection('Hello from Another HTML Page!', 'This is the second microservice.', 'Go to HTML1 Microservice', 'http://13.126.28.55:8081');
 }
