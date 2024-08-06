@@ -6,21 +6,32 @@ set -o pipefail  # Return the exit status of the last command in the pipe that f
 
 # Add swap space to the system to handle memory-intensive operations
 if ! swapon --show | grep -q '/swapfile'; then
+  echo "Creating swap space..."
   sudo fallocate -l 1G /swapfile
   sudo chmod 600 /swapfile
   sudo mkswap /swapfile
   sudo swapon /swapfile
   echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+else
+  echo "Swap space already set up."
 fi
 
 # Navigate to the application directory
-cd /var/www/myapp
+APP_DIR="/var/www/myapp"
+if [ -d "$APP_DIR" ]; then
+  cd "$APP_DIR"
+else
+  echo "Directory $APP_DIR not found, cannot proceed."
+  exit 1
+fi
 
 # Clean up node_modules to avoid potential conflicts
+echo "Removing existing node_modules..."
 rm -rf node_modules
 
 # Install npm dependencies if package.json is present
 if [ -f package.json ]; then
+  echo "Running npm install..."
   npm install
   echo "npm install completed"
 else
@@ -28,10 +39,19 @@ else
 fi
 
 # Ensure correct permissions and ownership
-sudo chown -R www-data:www-data /var/www/myapp
-sudo chmod -R 755 /var/www/myapp
+echo "Setting permissions and ownership..."
+sudo chown -R www-data:www-data "$APP_DIR"
+sudo chmod -R 755 "$APP_DIR"
 
 # Restart Apache to ensure it picks up any changes
-sudo systemctl restart apache2
+echo "Restarting Apache..."
+if command -v apache2 > /dev/null; then
+  sudo systemctl restart apache2
+elif command -v httpd > /dev/null; then
+  sudo systemctl restart httpd
+else
+  echo "Apache service not found, cannot restart."
+  exit 1
+fi
 
 echo "AfterInstall script completed successfully"
