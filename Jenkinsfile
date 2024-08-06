@@ -30,7 +30,7 @@ pipeline {
                 script {
                     sshagent(['jen-doc-ssh-key']) {
                         sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@13.126.28.55 "
+                        ssh -o StrictHostKeyChecking=no ubuntu@13.201.225.39 "
                             docker pull simple-html:latest &&
                             docker ps -q --filter 'name=simple_html' | grep -q . && docker stop simple_html || true &&
                             docker ps -a -q --filter 'name=simple_html' | grep -q . && docker rm simple_html || true &&
@@ -46,7 +46,7 @@ pipeline {
                 script {
                     sshagent(['jen-doc-ssh-key']) {
                         sh """
-                        ssh -o StrictHostKeyChecking=no ubuntu@13.126.28.55 "
+                        ssh -o StrictHostKeyChecking=no ubuntu@13.201.225.39 "
                             docker pull new-html:latest &&
                             docker ps -q --filter 'name=new_html' | grep -q . && docker stop new_html || true &&
                             docker ps -a -q --filter 'name=new_html' | grep -q . && docker rm new_html || true &&
