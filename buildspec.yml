@@ -1,0 +1,31 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18 # Example of specifying a runtime version
+    commands:
+      - echo Installing dependencies
+      - npm install
+
+  pre_build:
+    commands:
+      - echo Pre-build phase
+      - echo Listing all folders in the repository
+
+  build:
+    commands:
+      - echo Build phase
+      - echo Performing build operations
+      # Add your build commands here
+
+  post_build:
+    commands:
+      - echo Post-build phase
+      - echo Listing all folders again
+      # Any additional post-build commands
+
+artifacts:
+  files:
+    - '**/*'
+  discard-paths: no
