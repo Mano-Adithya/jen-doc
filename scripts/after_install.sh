@@ -43,14 +43,12 @@ echo "Setting permissions and ownership..."
 sudo chown -R www-data:www-data "$APP_DIR"
 sudo chmod -R 755 "$APP_DIR"
 
-# Restart Apache to ensure it picks up any changes
-echo "Restarting Apache..."
-if command -v apache2 > /dev/null; then
-  sudo systemctl restart apache2
-elif command -v httpd > /dev/null; then
-  sudo systemctl restart httpd
+# Restart Nginx to ensure it picks up any changes
+echo "Restarting Nginx..."
+if command -v nginx > /dev/null; then
+  sudo systemctl restart nginx
 else
-  echo "Apache service not found, cannot restart."
+  echo "Nginx service not found, cannot restart."
   exit 1
 fi
 
