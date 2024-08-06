@@ -3,33 +3,32 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 18 # Example of specifying a runtime version
+      nodejs: 18
     commands:
-      - echo Installing dependencies
-      - cd jen-doc
-      - npm install
+      - echo "Installing dependencies"
+      - echo "Listing root directory contents"
+      - ls -al
+      - if [ -d "jen-doc" ]; then cd jen-doc && npm install; else echo "jen-doc directory not found"; fi
 
   pre_build:
     commands:
-      - echo Pre-build phase
-      - echo Listing all folders in the repository
+      - echo "Pre-build phase"
+      - echo "Listing all folders in the repository"
       - ls -al
 
   build:
     commands:
-      - echo Build phase
-      - echo Performing build operations
-      # Add your build commands here
-      - cd jen-doc
-      - echo Listing all files in jen-doc directory
+      - echo "Build phase"
+      - echo "Performing build operations"
+      - if [ -d "jen-doc" ]; then cd jen-doc; else echo "jen-doc directory not found"; fi
+      - echo "Listing all files in the current directory"
       - ls -al
 
   post_build:
     commands:
-      - echo Post-build phase
-      - echo Listing all folders again
+      - echo "Post-build phase"
+      - echo "Listing all folders again"
       - ls -al
-      # Any additional post-build commands
 
 artifacts:
   files:
