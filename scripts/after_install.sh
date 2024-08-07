@@ -25,7 +25,7 @@ if docker ps -a --format '{{.Names}}' | grep -q 'simple-html-app'; then
 fi
 
 echo "Running Docker container for simple-html..."
-docker run -d -p 8081:80 --name simple-html-app simple-html-app || {
+docker run -d -p 8083:80 --name simple-html-app simple-html-app || {
   echo "Failed to run simple-html-app container"
   exit 1
 }
@@ -45,7 +45,7 @@ if docker ps -a --format '{{.Names}}' | grep -q 'new-html-app'; then
 fi
 
 echo "Running Docker container for new-html..."
-docker run -d -p 8082:80 --name new-html-app new-html-app || {
+docker run -d -p 8084:80 --name new-html-app new-html-app || {
   echo "Failed to run new-html-app container"
   exit 1
 }
