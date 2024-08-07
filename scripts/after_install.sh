@@ -27,14 +27,26 @@ echo "Setting permissions and ownership..."
 sudo chown -R www-data:www-data "$APP_DIR"
 sudo chmod -R 755 "$APP_DIR"
 
+# Check and update Nginx configuration if necessary
+NGINX_CONF="/etc/nginx/nginx.conf"
+if grep -q "listen 8083;" "$NGINX_CONF" || grep -q "listen 8084;" "$NGINX_CONF"; then
+  echo "Updating Nginx configuration to avoid port conflicts..."
+  sudo sed -i '/listen 8083;/d' "$NGINX_CONF"
+  sudo sed -i '/listen 8084;/d' "$NGINX_CONF"
+  sudo nginx -t
+fi
+
 # Restart Nginx to ensure it picks up any changes
 echo "Restarting Nginx..."
 if command -v nginx > /dev/null; then
-  sudo systemctl restart nginx
+  sudo systemctl restart nginx || { 
+    echo "Failed to restart Nginx, checking status..."; 
+    sudo systemctl status nginx.service; 
+    exit 1; 
+  }
 else
   echo "Nginx service not found, cannot restart."
   exit 1
 fi
 
 echo "AfterInstall script completed successfully."
-
