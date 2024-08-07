@@ -9,43 +9,32 @@ log_message() {
   echo "$(date '+%Y-%m-%d %H:%M:%S') - $1"
 }
 
-log_message "Starting cleanup script..."
+log_message "Starting before_install script..."
 
-# Define the path to the CodeDeploy deployment root
-DEPLOYMENT_ROOT="/opt/codedeploy-agent/deployment-root/0502f759-41ef-49cc-8e90-f1cd7849adac"
-
-# Ensure the deployment root directory exists
-if [ -d "$DEPLOYMENT_ROOT" ]; then
-  # Get a list of all deployment directories sorted by modification time, newest first
-  DEPLOYMENT_DIRS=$(ls -1t $DEPLOYMENT_ROOT)
-
-  # Convert the list to an array
-  DEPLOYMENT_ARRAY=($DEPLOYMENT_DIRS)
-
-  # Print debug information
-  log_message "All deployment directories: ${DEPLOYMENT_ARRAY[@]}"
-
-  # Calculate the number of directories to delete (keep the last two)
-  NUM_TO_DELETE=$((${#DEPLOYMENT_ARRAY[@]} - 1))
-
-  # Print debug information
-  log_message "Number of directories to delete: $NUM_TO_DELETE"
-
-  # If there are directories to delete, delete them
-  if [ $NUM_TO_DELETE -gt 0 ]; then
-    for ((i=1; i<$NUM_TO_DELETE+1; i++)); do
-      DIR_TO_DELETE="$DEPLOYMENT_ROOT/${DEPLOYMENT_ARRAY[$i]}"
-      rm -rf "$DIR_TO_DELETE"
-      log_message "Deleted old deployment directory: $DIR_TO_DELETE"
-    done
-  fi
+# Add swap space to the system to handle memory-intensive operations
+if ! swapon --show | grep -q '/swapfile'; then
+  log_message "Creating swap space..."
+  sudo fallocate -l 1G /swapfile
+  sudo chmod 600 /swapfile
+  sudo mkswap /swapfile
+  sudo swapon /swapfile
+  echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 else
-  log_message "Deployment root directory does not exist: $DEPLOYMENT_ROOT"
+  log_message "Swap space already set up."
 fi
 
-# Optionally, clear old logs if necessary
-LOG_PATH="/var/log/aws/codedeploy-agent/"
-find "$LOG_PATH" -type f -mtime +30 -exec rm -f {} +
-log_message "Cleared old logs in $LOG_PATH"
+# Install Docker if not installed
+if ! [ -x "$(command -v docker)" ]; then
+  log_message 'Docker is not installed. Installing Docker...'
+  apt-get update
+  apt-get install -y docker.io
+  sudo systemctl start docker
+  sudo systemctl enable docker
+else
+  log_message 'Docker is already installed.'
+fi
 
-log_message "Cleanup complete. All deployments except the last two have been removed."
+# Cleanup old Docker containers and images (optional)
+docker system prune -af
+
+log_message "before_install script completed."
