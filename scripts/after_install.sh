@@ -50,12 +50,19 @@ echo "Setting permissions and ownership..."
 sudo chown -R www-data:www-data "$APP_DIR"
 sudo chmod -R 755 "$APP_DIR"
 
-# Restart Nginx to ensure it picks up any changes
-echo "Restarting Nginx..."
-if command -v nginx > /dev/null; then
-  sudo systemctl restart nginx
+# Validate Nginx configuration
+echo "Validating Nginx configuration..."
+if sudo nginx -t; then
+  echo "Nginx configuration is valid, restarting Nginx..."
+  sudo systemctl restart nginx || {
+    echo "Failed to restart Nginx, checking status..."
+    sudo systemctl status nginx.service
+    sudo journalctl -xeu nginx.service
+    exit 1
+  }
 else
-  echo "Nginx service not found, cannot restart."
+  echo "Nginx configuration is invalid, cannot restart Nginx."
+  sudo nginx -t
   exit 1
 fi
 
