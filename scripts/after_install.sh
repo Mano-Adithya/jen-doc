@@ -27,10 +27,10 @@ run_docker_container() {
       docker rm "${app_name}-app" || true
     fi
 
-    # Check if the port is already in use
+    # Check if the port is already in use and kill the process using it
     if lsof -i:"${port}" -t >/dev/null; then
-      echo "Port ${port} is already in use, exiting."
-      exit 1
+      echo "Port ${port} is already in use, killing the process..."
+      fuser -k "${port}/tcp"
     fi
 
     echo "Running Docker container for $app_name on port ${port}..."
