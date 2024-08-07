@@ -51,6 +51,15 @@ sudo chown -R www-data:www-data "$APP_DIR"
 sudo chmod -R 755 "$APP_DIR"
 
 # Validate Nginx configuration
+NGINX_CONFIG_FILE="/etc/nginx/nginx.conf"
+
+# Check if Nginx is listening on the same ports as the Docker containers
+if grep -q "listen 8081;" "$NGINX_CONFIG_FILE" || grep -q "listen 8082;" "$NGINX_CONFIG_FILE"; then
+  echo "Nginx is configured to listen on ports 8081 or 8082, which are used by Docker containers. Updating Nginx configuration..."
+  sudo sed -i '/listen 8081;/d' "$NGINX_CONFIG_FILE"
+  sudo sed -i '/listen 8082;/d' "$NGINX_CONFIG_FILE"
+fi
+
 echo "Validating Nginx configuration..."
 if sudo nginx -t; then
   echo "Nginx configuration is valid, restarting Nginx..."
