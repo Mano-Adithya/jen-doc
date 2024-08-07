@@ -5,44 +5,21 @@ set -u  # Treat unset variables as an error and exit immediately
 set -o pipefail  # Return the exit status of the last command in the pipe that failed
 
 # Ensure Docker is running
-echo "Starting Docker..."
 sudo systemctl start docker
 
-# Function to build and run Docker container
-run_docker_container() {
-    local app_name=$1
-    local app_dir=$2
-    local port=$3
-    
-    echo "Building Docker image for $app_name..."
-    docker build -t "${app_name}-app" "${app_dir}" || {
-      echo "Failed to build ${app_name}-app image"
-      exit 1
-    }
+# Remove any existing Docker containers with the same names to avoid conflicts
+docker rm -f simple-html-app || true
+docker rm -f new-html-app || true
 
-    # Remove existing container if it exists
-    if docker ps -a --format '{{.Names}}' | grep -q "${app_name}-app"; then
-      echo "Removing existing ${app_name}-app container..."
-      docker stop "${app_name}-app" || true
-      docker rm "${app_name}-app" || true
-    fi
+# Build and run the Docker containers
 
-    # Check if the port is already in use and kill the process using it
-    if lsof -i:"${port}" -t >/dev/null; then
-      echo "Port ${port} is already in use, killing the process..."
-      fuser -k "${port}/tcp"
-    fi
+# For simple-html application
+docker build -t simple-html-app /var/www/myapp/simple-html
+docker run -d -p 8083:80 --name simple-html-app simple-html-app
 
-    echo "Running Docker container for $app_name on port ${port}..."
-    docker run -d -p "${port}:80" --name "${app_name}-app" "${app_name}-app" || {
-      echo "Failed to run ${app_name}-app container"
-      exit 1
-    }
-}
-
-# Run Docker containers
-run_docker_container "simple-html" "/var/www/myapp/simple-html" 8081
-run_docker_container "new-html" "/var/www/myapp/new-html" 8082
+# For new-html application
+docker build -t new-html-app /var/www/myapp/new-html
+docker run -d -p 8084:80 --name new-html-app new-html-app
 
 # Ensure correct permissions and ownership
 APP_DIR="/var/www/myapp"
@@ -50,29 +27,14 @@ echo "Setting permissions and ownership..."
 sudo chown -R www-data:www-data "$APP_DIR"
 sudo chmod -R 755 "$APP_DIR"
 
-# Validate Nginx configuration
-NGINX_CONFIG_FILE="/etc/nginx/nginx.conf"
-
-# Check if Nginx is listening on the same ports as the Docker containers
-if grep -q "listen 8081;" "$NGINX_CONFIG_FILE" || grep -q "listen 8082;" "$NGINX_CONFIG_FILE"; then
-  echo "Nginx is configured to listen on ports 8081 or 8082, which are used by Docker containers. Updating Nginx configuration..."
-  sudo sed -i '/listen 8081;/d' "$NGINX_CONFIG_FILE"
-  sudo sed -i '/listen 8082;/d' "$NGINX_CONFIG_FILE"
-fi
-
-echo "Validating Nginx configuration..."
-if sudo nginx -t; then
-  echo "Nginx configuration is valid, restarting Nginx..."
-  sudo systemctl restart nginx || {
-    echo "Failed to restart Nginx, checking status..."
-    sudo systemctl status nginx.service
-    sudo journalctl -xeu nginx.service
-    exit 1
-  }
+# Restart Nginx to ensure it picks up any changes
+echo "Restarting Nginx..."
+if command -v nginx > /dev/null; then
+  sudo systemctl restart nginx
 else
-  echo "Nginx configuration is invalid, cannot restart Nginx."
-  sudo nginx -t
+  echo "Nginx service not found, cannot restart."
   exit 1
 fi
 
 echo "AfterInstall script completed successfully."
+
